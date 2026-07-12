@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Log Expense')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('finance')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Log Expense')}"></div>
+    
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="transit-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 text-light">
+                            <i class="fa-solid fa-receipt me-2 text-indigo"></i>
+                            <span>Record Ancillary Expense</span>
+                        </h5>
+                        <a th:href="@{/finance}" class="btn btn-transit-outline btn-sm">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Cost Ledger
+                        </a>
+                    </div>
+
+                    <form th:action="@{/finance/expense/new}" th:object="${expense}" method="post">
+                        
+                        <div class="row g-4">
+                            <!-- Vehicle Selector -->
+                            <div class="col-md-6">
+                                <label for="vehicleId" class="form-label text-secondary font-weight-bold">Select Associated Vehicle</label>
+                                <select id="vehicleId" name="vehicleId" class="form-select transit-form-control" required>
+                                    <option value="" disabled selected>-- Select Vehicle --</option>
+                                    <option th:each="v : ${vehicles}" 
+                                            th:value="${v.id}" 
+                                            th:text="${v.vehicleName + ' (' + v.registrationNumber + ')'}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Cost Category -->
+                            <div class="col-md-6">
+                                <label for="category" class="form-label text-secondary font-weight-bold">Expense Cost Category</label>
+                                <select id="category" th:field="*{category}" class="form-select transit-form-control" required>
+                                    <option value="TOLLS">TOLLS (Bridge/Highway)</option>
+                                    <option value="PARKING">PARKING (Dockage/Lube)</option>
+                                    <option value="LODGING">LODGING (Driver lodging)</option>
+                                    <option value="FINES">FINES (Overweight/Compliance)</option>
+                                    <option value="REPAIRS_ANCILLARY">REPAIRS (Trivial repairs/Spares)</option>
+                                    <option value="OTHER">OTHER OPERATIONAL</option>
+                                </select>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('category')}" th:errors="*{category}">Error</div>
+                            </div>
+
+                            <!-- Amount -->
+                            <div class="col-md-6">
+                                <label for="amount" class="form-label text-secondary font-weight-bold">Record Cost/Expense Amount (₹)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-secondary">₹</span>
+                                    <input type="number" step="0.01" id="amount" th:field="*{amount}" class="form-control transit-form-control" placeholder="e.g. 75.00" required>
+                                </div>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}">Error</div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="col-md-12">
+                                <label for="description" class="form-label text-secondary font-weight-bold">Transaction Description / Purpose</label>
+                                <textarea id="description" th:field="*{description}" class="form-control transit-form-control" rows="3" placeholder="Identify item purchase, receipts number, or route details..." required></textarea>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Error</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions Buttons -->
+                        <div class="mt-4 pt-3 d-flex justify-content-end gap-3">
+                            <a th:href="@{/finance}" class="btn btn-transit-outline px-4">Cancel</a>
+                            <button type="submit" class="btn btn-transit px-4">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Save Expense Log
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

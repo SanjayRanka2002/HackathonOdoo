@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Maintenance Logs')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('maintenance')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Maintenance Control Room')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Top toolbar actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">Service Shop Checkouts</h4>
+                <p class="text-secondary mb-0 small">Schedule fleet asset overhauls, log components repairs, and track maintenance expenditures</p>
+            </div>
+            <a th:href="@{/maintenance/new}" class="btn btn-transit">
+                <i class="fa-solid fa-calculator me-2"></i>Schedule Service Task
+            </a>
+        </div>
+
+        <!-- Maintenance Table -->
+        <div class="transit-table-card">
+            <div class="transit-table-header">
+                <h5 class="mb-0 text-light"><i class="fa-solid fa-wrench me-2 text-indigo"></i>Repairs Records</h5>
+                <span class="badge bg-secondary p-2" th:text="${maintenanceLogs.size() + ' Total Operations'}">0 Logs</span>
+            </div>
+            <div class="table-responsive">
+                <table class="transit-table">
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Vehicle Asset</th>
+                            <th>Service Description</th>
+                            <th>Start Date</th>
+                            <th>Completion Date</th>
+                            <th>Cost Valuation</th>
+                            <th>Status State</th>
+                            <th class="text-center">Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="log : ${maintenanceLogs}">
+                            <td class="font-weight-bold text-light" th:text="'M-LOG-' + ${log.id}">ID</td>
+                            <td>
+                                <div class="d-flex flex-column" th:if="${log.vehicle != null}">
+                                    <span class="font-weight-bold text-light" th:text="${log.vehicle.vehicleName}">Volvo</span>
+                                    <small class="text-secondary" th:text="${log.vehicle.registrationNumber}">KA-01-ME</small>
+                                </div>
+                                <span th:if="${log.vehicle == null}" class="text-muted">N/A</span>
+                            </td>
+                            <td>
+                                <div style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                     th:text="${log.description}">Transmission overhaul</div>
+                            </td>
+                            <td th:text="${log.startDate != null ? #temporals.format(log.startDate, 'dd MMM yyyy, HH:mm') : 'N/A'}">Date</td>
+                            <td th:text="${log.completionDate != null ? #temporals.format(log.completionDate, 'dd MMM yyyy, HH:mm') : 'In progress'}">Date</td>
+                            <td class="text-danger font-weight-bold" 
+                                th:text="${log.cost != null ? '₹' + #numbers.formatDecimal(log.cost, 1, 'COMMA', 2, 'POINT') : '₹0.00'}">Cost</td>
+                            <td>
+                                <span class="status-badge" th:classappend="${#strings.toLowerCase(log.status)}" th:text="${log.status}">PENDING</span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <th:block th:if="${log.status != 'COMPLETED'}">
+                                        <a th:href="@{/maintenance/complete/{id}(id=${log.id})}" class="btn btn-transit-outline btn-sm text-success" title="Mark Completed">
+                                            <i class="fa-solid fa-square-check"></i>
+                                        </a>
+                                    </th:block>
+                                    <a th:href="@{/maintenance/edit/{id}(id=${log.id})}" class="btn btn-transit-outline btn-sm text-info" title="Edit logs">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a onclick="return confirm('Delete this repair log permanently?');" 
+                                       th:href="@{/maintenance/delete/{id}(id=${log.id})}" class="btn btn-transit-outline btn-sm text-danger" title="Remove log">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(maintenanceLogs)}">
+                            <td colspan="8" class="text-center text-secondary py-5">
+                                <i class="fa-solid fa-toolbox mb-3 text-muted display-4"></i>
+                                <p>No fleet assets currently checked out for repairs. Click 'Schedule Service Task' to en-queue.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

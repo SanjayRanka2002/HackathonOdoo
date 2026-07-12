@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TransitOps Enterprise Documentation</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            margin: 0;
+            padding: 40px;
+            background-color: #ffffff;
+        }
+        h1, h2, h3, h4 {
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+        h1 {
+            font-size: 28pt;
+            border-bottom: 3px solid #1e3a8a;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 20pt;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        h3 {
+            font-size: 14pt;
+            margin-top: 20px;
+        }
+        p {
+            font-size: 11pt;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+        }
+        li {
+            font-size: 11pt;
+            margin-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            margin-bottom: 25px;
+        }
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            text-align: left;
+            font-size: 10.5pt;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+        .code-block {
+            font-family: Consolas, Monaco, monospace;
+            background-color: #f8fafc;
+            border-left: 4px solid #64748b;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 10pt;
+            white-space: pre-wrap;
+            color: #0f172a;
+        }
+        .info-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-box p {
+            margin: 0;
+            color: #1e40af;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: #e2e8f0;
+            color: #475569;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+        .cover-page {
+            text-align: center;
+            padding-top: 100px;
+            padding-bottom: 150px;
+            page-break-after: always;
+        }
+        .cover-title {
+            font-size: 36pt;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .cover-subtitle {
+            font-size: 18pt;
+            color: #64748b;
+            margin-bottom: 50px;
+        }
+        .cover-meta {
+            font-size: 12pt;
+            color: #475569;
+            margin-top: 150px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cover Page -->
+    <div class="cover-page">
+        <div class="cover-title">TransitOps Enterprise</div>
+        <div class="cover-subtitle">Transport & Operations Management System</div>
+        <hr style="width: 200px; border: 2px solid #1e3a8a; margin: 40px auto;">
+        <p style="text-align: center; font-size: 14pt; color: #334155;">Complete System Specification & Documentation</p>
+        <div class="cover-meta">
+            <p style="text-align: center;"><strong>Version:</strong> 1.0 (Production Core)</p>
+            <p style="text-align: center;"><strong>Platform Stack:</strong> Spring Boot 3.2, Thymeleaf, MySQL, Hibernate</p>
+            <p style="text-align: center;"><strong>Date Created:</strong> July 2026</p>
+        </div>
+    </div>
+
+    <!-- Executive Summary -->
+    <h1>1. Executive Overview</h1>
+    <p>
+        <strong>TransitOps</strong> is an enterprise-grade Transport Operations and Logistics management system. It provides logistics managers, dispatch officers, and financial analysts with a centralized platform to govern vehicle fleets, driver duty schedules, active trip dispatches, repairs service tracks, and operational cash flows.
+    </p>
+    <div class="info-box">
+        <p><strong>Strategic Purpose:</strong> To lower logistics expenditures, enhance driver safety scores, enforce regulatory compliance, and provide real-time operating metrics.</p>
+    </div>
+    
+    <h2>1.1 Key Modules</h2>
+    <ul>
+        <li><strong>Dashboard Analytics:</strong> High-level view of active fleet status, active dispatches, driver duty allocations, maintenance queues, and revenue analysis reports.</li>
+        <li><strong>Vehicle Fleet Management:</strong> Database profile tracking for model specs, load limits, odometer logs, acquisition valuation, and digital compliance document cabinets (permits, registration, insurance).</li>
+        <li><strong>Driver Operations:</strong> Governance of commercial licenses categories, license expiry dates, contact details, emergency notifications, and driver running safety scores.</li>
+        <li><strong>Dispatch & Trip Control:</strong> Lifecycle management of route dispatches, cargo weights, route distances, active statuses (dispatched, arrived, completed), and dynamic driver-vehicle linkages.</li>
+        <li><strong>Maintenance Shop:</strong> Scheduler for fleet mechanical issues, component repairs, cylinder overhauls, service costs tracking, and history logs.</li>
+        <li><strong>Financial Bookkeeping:</strong> Verification of diesel fuel log refills (Unit prices, refill stations, quantities, and odometer tracking) and ancillary expenditures logs (tolls, parking, trivial repairs, fines) with Excel and PDF reporting.</li>
+        <li><strong>Admin Control Center:</strong> Multi-role access control configurations (User Roles: ADMIN, FLEET_MANAGER, DISPATCHER, FINANCIAL_ANALYST), activity audit logs, and Notification alerts.</li>
+    </ul>
+
+    <!-- Architecture & Technology Stack -->
+    <h1>2. Technology Architecture</h1>
+    <p>
+        TransitOps is engineered on the Java Virtual Machine ecosystem using the Spring framework. It is configured as a robust monolithic MVC application providing server-side HTML rendering through Thymeleaf, backed by an object-relational mapping repository database schema.
+    </p>
+    
+    <h2>2.1 Core Framework Specs</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Technology Type Component</th>
+                <th>Underlying Framework / Standard</th>
+                <th>Version</th>
+                <th>Strategic / Operational Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Java Runtime Ecosystem</td>
+                <td>JDK 17 LTS (Amazon Corretto / OpenJDK)</td>
+                <td>17</td>
+                <td>Run execution environment</td>
+            </tr>
+            <tr>
+                <td>Enterprise Web Framework</td>
+                <td>Spring Boot 3 (Starter MVC, Validation)</td>
+                <td>3.2.5</td>
+                <td>Dependency injection, web requests router, beans management</td>
+            </tr>
+            <tr>
+                <td>Security Layer</td>
+                <td>Spring Security 6</td>
+                <td>6.x</td>
+                <td>Authentication, role-based resource access block rules (RBAC)</td>
+            </tr>
+            <tr>
+                <td>User Interface (UI) Views</td>
+                <td>Thymeleaf Text Templates</td>
+                <td>3.x</td>
+                <td>Server-side text template interpolation, fragments structure layout</td>
+            </tr>
+            <tr>
+                <td>Database Engine</td>
+                <td>MySQL Server Community Edition</td>
+                <td>8.x</td>
+                <td>Relational persistent data store</td>
+            </tr>
+            <tr>
+                <td>ORM Layer</td>
+                <td>Spring Data JPA + Hibernate Core</td>
+                <td>6.x</td>
+                <td>Auto table validation, transaction mappings, schema generator</td>
+            </tr>
+            <tr>
+                <td>PDF Document Generation</td>
+                <td>LibrePDF/OpenPDF</td>
+                <td>1.3.36</td>
+                <td>Programmatic PDF receipts creation with styled tables</td>
+            </tr>
+            <tr>
+                <td>Excel Spreadsheet Generation</td>
+                <td>Apache POI (ooxml)</td>
+                <td>5.2.5</td>
+                <td>Binary Excel spreadsheet reports builder</td>
+            </tr>
+            <tr>
+                <td>Boilerplate Reduction</td>
+                <td>Project Lombok</td>
+                <td>Lombok 1.18+</td>
+                <td>Compile-time generation of Getter, Setter, Builder, and constructors</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="info-box">
+        <p><strong>Database Configuration:</strong> The application relies on `spring.jpa.hibernate.ddl-auto=update` settings in application properties. Database tables are dynamically scaled and altered according to model classes on class reload.</p>
+    </div>
+
+    <!-- Security & RBAC Configuration -->
+    <h1>3. Access Control (RBAC) System</h1>
+    <p>
+        Security is managed at the configuration level with Spring Security. Role-based privileges are strictly enforced. Requests entering the app are authenticated through a customized database auth provider (`CustomUserDetailsService`).
+    </p>
+
+    <h2>3.1 User Roles Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Role Identifier</th>
+                <th>Intended User</th>
+                <th>Access Privileges Permission Limits</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>ADMIN</code></td>
+                <td>System Administrator</td>
+                <td>Full operations, management of user accounts, database audit log overview.</td>
+            </tr>
+            <tr>
+                <td><code>FLEET_MANAGER</code></td>
+                <td>Operations Director</td>
+                <td>Governance of vehicles and driver data profiles. Scheduling services.</td>
+            </tr>
+            <tr>
+                <td><code>DISPATCHER</code></td>
+                <td>Logistics Dispatch Officer</td>
+                <td>Trip creation, status updates, monitoring vehicle/driver availability.</td>
+            </tr>
+            <tr>
+                <td><code>FINANCIAL_ANALYST</code></td>
+                <td>Accounts Team</td>
+                <td>Logging fuel refills, auditing expenses, generating PDF/Excel summaries.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3.2 Preseeded Operational User Accounts</h2>
+    <p>
+        For demonstration and testing purposes, the application automatically seeds the database with sample profiles representing each organizational role:
+    </p>
+    <ul>
+        <li><strong>Administrator:</strong> Username: <code>admin</code> | Password: <code>admin</code></li>
+        <li><strong>Fleet Manager:</strong> Username: <code>manager</code> | Password: <code>manager</code></li>
+        <li><strong>Dispatcher:</strong> Username: <code>dispatcher</code> | Password: <code>dispatcher</code></li>
+        <li><strong>Financial Analyst:</strong> Username: <code>finance</code> | Password: <code>finance</code></li>
+    </ul>
+
+    <!-- Database Schema and Domain Entities -->
+    <h1>4. Database Schema & Mappings</h1>
+    <p>
+        The relational architecture connects multiple structural domain entities, mapped as standard Java JPA Entities:
+    </p>
+
+    <h2>4.1 Entity Relationship Diagram Core Structure</h2>
+    <ul>
+        <li><strong>Vehicle (1 : N) Trips:</strong> A vehicle can be assigned to multiple historical trips.</li>
+        <li><strong>Vehicle (1 : N) MaintenanceLogs:</strong> A vehicle holds a history of repairs requests.</li>
+        <li><strong>Vehicle (1 : N) FuelLogs:</strong> Tracks fuel refills spent on the vehicle.</li>
+        <li><strong>Vehicle (1 : N) Expenses:</strong> Anchors tolls, repairs, and other operational fees.</li>
+        <li><strong>Vehicle (1 : N) VehicleDocuments:</strong> Stores digitized compliance uploads.</li>
+        <li><strong>Driver (1 : N) Trips:</strong> A commercial driver is tied to multiple logistics dispatches.</li>
+        <li><strong>User (N : 1) Role:</strong> Enforces role assignments in security authorization contexts.</li>
+    </ul>
+
+    <h2>4.2 Entity Field Schemas</h2>
+
+    <h3>Vehicle Entity (<code>vehicles</code>)</h3>
+    <ul>
+        <li><code>id</code> (Long, PK, Auto-increment)</li>
+        <li><code>registrationNumber</code> (String, Unique, Not Null) - Plate ID</li>
+        <li><code>vehicleName</code> (String, Not Null) - Brand Name</li>
+        <li><code>vehicleType</code> (String, Not Null) - Truck class</li>
+        <li><code>vehicleModel</code> (String) - Engineering specs</li>
+        <li><code>loadCapacity</code> (Double, Not Null) - Capacity in Tons</li>
+        <li><code>purchaseCost</code> (Double) - Acquisition Capital (Rupees ₹)</li>
+        <li><code>currentOdometer</code> (Double, Not Null) - Running total in km</li>
+        <li><code>status</code> (String, Not Null) - AVAILABLE, ON_TRIP, IN_SHOP, RETIRED</li>
+    </ul>
+
+    <h3>FuelLog Entity (<code>fuel_logs</code>)</h3>
+    <ul>
+        <li><code>id</code> (Long, PK, Auto-increment)</li>
+        <li><code>fuelDate</code> (LocalDateTime, Not Null)</li>
+        <li><code>quantity</code> (Double, Not Null) - Fuel loaded (Liters)</li>
+        <li><code>pricePerLiter</code> (Double, Not Null) - Unit price (Rupees ₹)</li>
+        <li><code>cost</code> (Double, Not Null) - Total expense cost (Rupees ₹)</li>
+        <li><code>odometerReading</code> (Double, Not Null) - Odometer reading during refill</li>
+        <li><code>fuelStation</code> (String) - Refill station name</li>
+        <li><code>vehicle_id</code> (Long, FK) - Link to Vehicle</li>
+    </ul>
+
+    <h3>Expense Entity (<code>expenses</code>)</h3>
+    <ul>
+        <li><code>id</code> (Long, PK, Auto-increment)</li>
+        <li><code>expenseDate</code> (LocalDate, Not Null)</li>
+        <li><code>category</code> (String, Not Null) - TOLL, PARKING, FUEL_EXTRA, REPAIRS_ANCILLARY, OTHER</li>
+        <li><code>amount</code> (Double, Not Null) - Rupees ₹ Value</li>
+        <li><code>description</code> (String, Not Null) - Remarks</li>
+        <li><code>vehicle_id</code> (Long, FK) - Target vehicle</li>
+    </ul>
+
+    <!-- Technical Implementations Features -->
+    <h1>5. Operational Feature Implementation Details</h1>
+    
+    <h2>5.1 Fuel Log calculations & auto-sync</h2>
+    <p>
+        The finance module is integrated with automatic input values bindings and frontend scripts validation. In the <code>Record Fuel Log</code> page, standard unit operations are executed:
+    </p>
+    <div class="code-block">
+Total Cost = Quantity (Liters) &times; Price Per Liter
+    </div>
+    <p>
+        An inline JavaScript script dynamically binds keyup listeners to the Quantity and Unit Price form inputs. When fields are modified, the total Refill Cost is automatically computed and placed in the cost input container, reducing manual calculation errors.
+    </p>
+    
+    <h2>5.2 Compliance Document Uploads</h2>
+    <p>
+        Vehicles files are saved in the project path under local directories, and references are written to the database under <code>VehicleDocument</code>. The files are retrieved dynamically by the server, allowing supervisors to access insurance policies directly from the browser window.
+    </p>
+
+    <h2>5.3 Live Dashboard KPI Calculations</h2>
+    <p>
+        The dashboard calculates real-time operational financial margins:
+    </p>
+    <ul>
+        <li><strong>Gross Revenue:</strong> Computed dynamically based on completed dispatches: <code>(Trip Distance &times; ₹4.5) + (Cargo Weight &times; ₹12.0)</code>.</li>
+        <li><strong>Total Expenditures:</strong> The summary total of all fuel log refills, repair entries, and ancillary expenses values.</li>
+        <li><strong>Net Profit Margin:</strong> <code>Gross Revenue - Total Expenditures</code>.</li>
+    </ul>
+
+    <!-- Running & Deployment Guide -->
+    <h1>6. Developer Operational Manual</h1>
+    
+    <h2>6.1 Local Sandbox Startup</h2>
+    <p>
+        To compile, initialize, and execute the TransitOps runtime sandbox, perform the following Maven build tasks:
+    </p>
+    
+    <div class="code-block">
+# 1. Clean target artifacts and build binary classes
+mvn clean compile
+
+# 2. Start the local server instance via Spring Boot plug-in
+mvn spring-boot:run
+    </div>
+    
+    <p>
+        Once the log output prints <code>Started HackhathonApplication in ...</code>, open a browser window and navigate to:
+    </p>
+    <div class="code-block">
+http://localhost:8080
+    </div>
+
+    <h2>6.2 System Database Config Properties</h2>
+    <p>
+        Database integration connections are stored within <code>src/main/resources/application.properties</code>:
+    </p>
+    
+    <div class="code-block">
+spring.datasource.url=jdbc:mysql://localhost:3306/Babyproject?useSSL=false&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=1234
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+    </div>
+
+    <div class="info-box" style="background-color: #fef3c7; border-left-4px-solid: #d97706;">
+        <p style="color: #92400e;"><strong>Note:</strong> Ensure a MySQL database schema named `Babyproject` is initialized on your local environment before startup execution.</p>
+    </div>
+
+</body>
+</html>

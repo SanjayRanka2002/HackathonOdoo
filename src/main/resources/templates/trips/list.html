@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Trips Dispatched')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('trips')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Trip Dispatch Control')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Top toolbar actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">Active Route Dispatches</h4>
+                <p class="text-secondary mb-0 small">Send cargo trucks, match available drivers, record route distances and payloads</p>
+            </div>
+            <a th:href="@{/trips/new}" class="btn btn-transit">
+                <i class="fa-solid fa-plus me-2"></i>Dispatch A New Route
+            </a>
+        </div>
+
+        <!-- Trips Table -->
+        <div class="transit-table-card">
+            <div class="transit-table-header">
+                <h5 class="mb-0 text-light"><i class="fa-solid fa-route me-2 text-indigo"></i>Routes Logs</h5>
+                <span class="badge bg-secondary p-2" th:text="${trips.size() + ' Total Operations'}">0 Trips</span>
+            </div>
+            <div class="table-responsive">
+                <table class="transit-table">
+                    <thead>
+                        <tr>
+                            <th>Trip ID</th>
+                            <th>Cargo / Route</th>
+                            <th>Asset Truck Details</th>
+                            <th>Driver Operator</th>
+                            <th>Status State</th>
+                            <th>Timelines</th>
+                            <th class="text-center">Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="trip : ${trips}">
+                            <td class="font-weight-bold text-light" th:text="'TRIP-' + ${trip.id}">ID</td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="font-weight-bold text-light" th:text="${trip.destination}">To Destination</span>
+                                    <small class="text-secondary" th:text="'From ' + ${trip.source} + ' • ' + ${trip.cargoWeight} + ' Tons'"></small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span th:text="${trip.vehicle != null ? trip.vehicle.vehicleName : 'N/A'}">Truck</span>
+                                    <small class="text-secondary" th:text="${trip.vehicle != null ? trip.vehicle.registrationNumber : ''}"></small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span th:text="${trip.driver != null ? trip.driver.driverName : 'N/A'}">Driver</span>
+                                    <small class="text-secondary" th:text="${trip.driver != null ? trip.driver.phone : ''}"></small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge" th:classappend="${#strings.toLowerCase(trip.status)}" th:text="${trip.status}">DISPATCHED</span>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column small">
+                                    <span th:text="'Dep: ' + ${trip.departure != null ? #temporals.format(trip.departure, 'dd MMM, HH:mm') : 'N/A'}">Departure</span>
+                                    <span class="text-success" th:if="${trip.arrival != null}" th:text="'Arr: ' + ${#temporals.format(trip.arrival, 'dd MMM, HH:mm')}">Arrival</span>
+                                    <span class="text-secondary" th:if="${trip.arrival == null}">In Transit...</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <th:block th:if="${trip.status == 'DISPATCHED'}">
+                                        <a th:href="@{/trips/complete/{id}(id=${trip.id})}" class="btn btn-transit-outline btn-sm text-success" title="Mark Route Completed">
+                                            <i class="fa-solid fa-square-check"></i>
+                                        </a>
+                                        <a onclick="return confirm('Cancel this route dispatch? Vehicle & driver states will be freed.');" 
+                                           th:href="@{/trips/cancel/{id}(id=${trip.id})}" class="btn btn-transit-outline btn-sm text-warning" title="Cancel Route">
+                                            <i class="fa-solid fa-rectangle-xmark"></i>
+                                        </a>
+                                    </th:block>
+                                    <a onclick="return confirm('Delete operational log record?');" 
+                                       th:href="@{/trips/delete/{id}(id=${trip.id})}" class="btn btn-transit-outline btn-sm text-danger" title="Delete record">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(trips)}">
+                            <td colspan="7" class="text-center text-secondary py-5">
+                                <i class="fa-solid fa-signs-post mb-3 text-muted display-4"></i>
+                                <p>No dispatch routes registered yet. Click 'Dispatch A New Route' to start.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

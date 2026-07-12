@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Operator Details - ' + driver.driverName)}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('drivers')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Operator Profile')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Top toolbar actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/drivers}" class="btn btn-transit-outline btn-sm mb-2">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Back to Roster roster
+                </a>
+                <h4 class="mb-0 text-light" th:text="${driver.driverName}">Driver Name</h4>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/drivers/edit/{id}(id=${driver.id})}" class="btn btn-transit">
+                    <i class="fa-solid fa-pen-to-square me-2"></i>Edit operator logs
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            
+            <!-- Left Panel: General Info -->
+            <div class="col-lg-5">
+                <div class="transit-card h-100">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h5 class="mb-0 text-light"><i class="fa-solid fa-circle-info me-2 text-indigo"></i>Operator Details</h5>
+                        <span class="status-badge" th:classappend="${#strings.toLowerCase(driver.status)}" th:text="${driver.status}">Status</span>
+                    </div>
+                    
+                    <table class="table table-dark table-borderless bg-transparent">
+                        <tbody>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">Commercial License No.:</td>
+                                <td class="text-light text-end font-weight-bold" th:text="${driver.licenseNumber}">DL-123456</td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">License Classification:</td>
+                                <td class="text-light text-end" th:text="${driver.licenseCategory}">CDL Class A</td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">Certification Expiry:</td>
+                                <td class="text-light text-end text-warning" th:text="${driver.expiryDate}">2026-12-31</td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">Mobile Phone:</td>
+                                <td class="text-light text-end" th:text="${driver.phone}">+1 (555) 123-4567</td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">Email Address:</td>
+                                <td class="text-light text-end" th:text="${driver.email}">driver@transitops.com</td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">Safety Score Rating:</td>
+                                <td class="text-light text-end text-success font-weight-bold">
+                                    <span th:text="${driver.safetyScore != null ? driver.safetyScore : '4.5'}">4.5</span>
+                                    <i class="fa-solid fa-star text-warning ms-1" style="font-size: 0.8rem;"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">Residence Address:</td>
+                                <td class="text-light text-end small" th:text="${driver.address != null ? driver.address : 'N/A'}">Address</td>
+                            </tr>
+                            <tr>
+                                <td class="text-secondary ps-0 py-2">Emergency Contact:</td>
+                                <td class="text-light text-end text-info small" th:text="${driver.emergencyContact != null ? driver.emergencyContact : 'N/A'}">Contact</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Right Panel: Document Folder -->
+            <div class="col-lg-7">
+                <div class="transit-card h-100">
+                    <h5 class="mb-4 text-light"><i class="fa-solid fa-folder-closed me-2 text-cyan"></i>Digital Documents Cabinet</h5>
+                    
+                    <!-- Active Documents Upload list -->
+                    <div class="mb-4">
+                        <p class="text-secondary small">Uploaded license copies, medical clearances, and background checks:</p>
+                        
+                        <div class="list-group list-group-flush border-bottom border-top border-secondary bg-transparent">
+                            <div class="list-group-item bg-transparent text-secondary py-3 px-0 d-flex justify-content-between align-items-center"
+                                 th:each="doc : ${documents}">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fa-solid fa-file-pdf text-danger display-6"></i>
+                                    <div class="d-flex flex-column">
+                                        <strong class="text-light" th:text="${doc.documentName}">Certificate</strong>
+                                        <small class="text-secondary" th:text="${doc.documentType} + ' • Expiry: ' + ${doc.expiryDate != null ? doc.expiryDate : 'No Expiry'}">INSURANCE</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a th:href="${doc.filePath}" class="btn btn-transit-outline btn-sm text-indigo" target="_blank">
+                                        <i class="fa-solid fa-eye me-1"></i>View
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="py-4 text-center text-muted" th:if="${#lists.isEmpty(documents)}">
+                                <i class="fa-solid fa-folder-open display-5 mb-2 text-secondary"></i>
+                                <p class="mb-0 small">No digital files uploaded yet. Use form below.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add compliance file form -->
+                    <div class="bg-dark p-3 rounded border border-secondary shadow-sm">
+                        <h6 class="mb-3 text-light"><i class="fa-solid fa-file-arrow-up me-2"></i>Upload Operator Certificate</h6>
+                        
+                        <form th:action="@{/drivers/{id}/documents(id=${driver.id})}" method="post" enctype="multipart/form-data">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="documentName" class="form-label text-secondary small">Document Title/Name</label>
+                                    <input type="text" id="documentName" name="documentName" class="form-control transit-form-control form-control-sm" placeholder="e.g. DL Front Scan" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="documentType" class="form-label text-secondary small">Classification Category</label>
+                                    <select id="documentType" name="documentType" class="form-select transit-form-control form-control-sm" required>
+                                        <option value="LICENSE_PROOF">LICENSE_PROOF</option>
+                                        <option value="MEDICAL_CERTIFICATE">MEDICAL_CERTIFICATE</option>
+                                        <option value="BACKGROUND_CHECK">BACKGROUND_CHECK</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="expiryDate" class="form-label text-secondary small">Expiry Date</label>
+                                    <input type="date" id="expiryDate" name="expiryDate" class="form-control transit-form-control form-control-sm">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="file" class="form-label text-secondary small">Choose Document file (PDF / JPG)</label>
+                                    <input type="file" id="file" name="file" class="form-control transit-form-control form-control-sm" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3 text-end">
+                                <button type="submit" class="btn btn-transit btn-sm px-3">
+                                    <i class="fa-solid fa-file-import me-1"></i>Upload file
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

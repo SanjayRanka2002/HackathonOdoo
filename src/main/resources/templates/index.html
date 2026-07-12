@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!-- Header head inclusion -->
+<head th:replace="~{fragments/header :: head('Dashboard')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('dashboard')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Dashboard')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- KPI Counters Grid -->
+        <div class="row g-4 mb-4">
+            <!-- Total Fleet -->
+            <div class="col-md-3">
+                <div class="transit-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="kpi-title">Total Fleet</div>
+                        <div class="kpi-value" th:text="${totalVehicles}">0</div>
+                        <div class="kpi-trend text-secondary">
+                            <span th:text="${availableVehicles}">0</span> available, 
+                            <span th:text="${inShopVehicles}">0</span> in shop
+                        </div>
+                    </div>
+                    <div class="kpi-icon indigo">
+                        <i class="fa-solid fa-truck"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Dispatch -->
+            <div class="col-md-3">
+                <div class="transit-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="kpi-title">Active Trips</div>
+                        <div class="kpi-value" th:text="${activeTrips}">0</div>
+                        <div class="kpi-trend text-secondary">
+                            In transit scheduled
+                        </div>
+                    </div>
+                    <div class="kpi-icon cyan">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Driver Duty -->
+            <div class="col-md-3">
+                <div class="transit-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="kpi-title">Active Drivers</div>
+                        <div class="kpi-value" th:text="${availableDrivers + activeDrivers}">0</div>
+                        <div class="kpi-trend text-success">
+                            <span th:text="${availableDrivers}">0</span> ready on duty
+                        </div>
+                    </div>
+                    <div class="kpi-icon success">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pending Shop Maintenance -->
+            <div class="col-md-3">
+                <div class="transit-card d-flex align-items-center justify-content-between">
+                    <div>
+                        <div class="kpi-title">In Shop Service</div>
+                        <div class="kpi-value" th:text="${pendingMaintenance}">0</div>
+                        <div class="kpi-trend text-danger">
+                            Repair cost: ₹<span th:text="${#numbers.formatDecimal(maintenanceCost, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </div>
+                    </div>
+                    <div class="kpi-icon danger">
+                        <i class="fa-solid fa-wrench"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Cards -->
+        <div class="row g-4 mb-4">
+            <!-- Financial Overview Card -->
+            <div class="col-lg-4">
+                <div class="transit-card h-100">
+                    <h5 class="card-title mb-4">Operating Financials</h5>
+                    
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-secondary">Gross Revenue:</span>
+                        <strong class="text-success">₹<span th:text="${#numbers.formatDecimal(totalRevenue, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-secondary">Expenses (Fuel/Other):</span>
+                        <strong class="text-danger">₹<span th:text="${#numbers.formatDecimal(totalOperatingCost, 1, 'COMMA', 2, 'POINT')}">0.00</span></strong>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="text-primary font-weight-bold">Net Margin Profit:</span>
+                        <h4 class="mb-0 font-weight-bold" th:classappend="${netProfit >= 0} ? 'text-success' : 'text-danger'">
+                            ₹<span th:text="${#numbers.formatDecimal(netProfit, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytical Graphs -->
+            <div class="col-lg-4">
+                <div class="transit-card h-100">
+                    <h5 class="card-title mb-3">Fleet Custody Capacity</h5>
+                    <div style="height: 180px;"><canvas id="fleetStatusChart"></canvas></div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="transit-card h-100">
+                    <h5 class="card-title mb-3">Operating Expense Mix</h5>
+                    <div style="height: 180px;"><canvas id="expenseMixChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity Table Rows -->
+        <div class="row g-4">
+            <!-- Active Dispatch List -->
+            <div class="col-lg-7">
+                <div class="transit-table-card">
+                    <div class="transit-table-header">
+                        <h5 class="mb-0 text-light"><i class="fa-solid fa-truck-ramp-box me-2 text-indigo"></i>Recent Trip Dispatches</h5>
+                        <a th:href="@{/trips}" class="btn btn-transit-outline btn-sm">Manage Trips</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="transit-table">
+                            <thead>
+                                <tr>
+                                    <th>Trip ID</th>
+                                    <th>Route</th>
+                                    <th>Vehicle / Driver</th>
+                                    <th>Status</th>
+                                    <th>Departure</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="trip : ${recentTrips}">
+                                    <td th:text="'TRIP-' + ${trip.id}">ID</td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="font-weight-bold text-light" th:text="${trip.destination}">Dest</span>
+                                            <small class="text-secondary" th:text="'from ' + ${trip.source}"></small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span th:text="${trip.vehicle != null ? trip.vehicle.vehicleName : 'N/A'}">Truck</span>
+                                            <small class="text-secondary" th:text="${trip.driver != null ? trip.driver.driverName : 'N/A'}"></small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge" th:classappend="${#strings.toLowerCase(trip.status)}" th:text="${trip.status}">Status</span>
+                                    </td>
+                                    <td th:text="${trip.departure != null ? #temporals.format(trip.departure, 'dd MMM yyyy, HH:mm') : 'N/A'}">Time</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentTrips)}">
+                                    <td colspan="5" class="text-center text-secondary py-4">No active trips dispatched.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Queue -->
+            <div class="col-lg-5">
+                <div class="transit-table-card">
+                    <div class="transit-table-header">
+                        <h5 class="mb-0 text-light"><i class="fa-solid fa-screwdriver-wrench me-2 text-cyan"></i>Service Queue Checkouts</h5>
+                        <a th:href="@{/maintenance}" class="btn btn-transit-outline btn-sm">Schedule Service</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="transit-table">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Reason / Description</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="m : ${recentMaintenance}">
+                                    <td class="font-weight-bold text-light" th:text="${m.vehicle != null ? m.vehicle.vehicleName : 'N/A'}">Truck</td>
+                                    <td>
+                                        <div style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                                             th:text="${m.description}">Overhaul</div>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge" th:classappend="${#strings.toLowerCase(m.status)}" th:text="${m.status}">PENDING</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentMaintenance)}">
+                                    <td colspan="3" class="text-center text-secondary py-4">No vehicles currently in shop.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+    
+    <!-- Chart.js and Custom Script for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            // Fleet Status Chart
+            const availableVal = /*[[${availableVehicles}]]*/ 0;
+            const tripVal = /*[[${activeVehicles}]]*/ 0;
+            const shopVal = /*[[${inShopVehicles}]]*/ 0;
+            
+            new Chart(document.getElementById('fleetStatusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Available', 'On Trip', 'In Shop'],
+                    datasets: [{
+                        data: [availableVal, tripVal, shopVal],
+                        backgroundColor: ['#10b981', '#3b82f6', '#ef4444'],
+                        borderWidth: 1,
+                        borderColor: '#374151'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#9ca3af' }
+                        }
+                    }
+                }
+            });
+
+            // Operating Expense Mix
+            const fuelC = /*[[${fuelCost}]]*/ 0;
+            const maintC = /*[[${maintenanceCost}]]*/ 0;
+            const otherC = /*[[${otherCost}]]*/ 0;
+
+            new Chart(document.getElementById('expenseMixChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Fuel Logs', 'Maintenance', 'Ancillary Expenses'],
+                    datasets: [{
+                        label: 'Operating Costs (₹)',
+                        data: [fuelC, maintC, otherC],
+                        backgroundColor: ['#06b6d4', '#6366f1', '#f59e0b'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#9ca3af' },
+                            grid: { color: '#374151' }
+                        },
+                        x: {
+                            ticks: { color: '#9ca3af' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
