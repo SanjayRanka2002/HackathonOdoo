@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Head Fragment -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title + ' - TransitOps'}">TransitOps</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom style.css -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Top Navbar Fragment -->
+    <div th:fragment="top-navbar(pageTitle)" class="top-navbar">
+        <div class="page-title">
+            <h1 th:text="${pageTitle}">Dashboard</h1>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <!-- Notifications Dropdown -->
+            <div class="dropdown" sec:authorize="isAuthenticated()">
+                <button class="btn btn-transit-outline btn-sm position-relative" type="button" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                          th:if="${unreadNotificationsCount > 0}" 
+                          th:text="${unreadNotificationsCount}">
+                        3
+                    </span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" style="width: 280px; max-height: 350px; overflow-y: auto;">
+                    <li class="p-2 border-bottom border-secondary text-center small text-secondary">
+                        Recent Notifications
+                    </li>
+                    <li th:each="n : ${recentNotifications}">
+                        <a class="dropdown-item text-wrap py-2" th:href="@{/notifications}" th:classappend="${not n.isRead} ? 'bg-dark text-info' : ''">
+                            <div th:text="${n.message}" style="font-size: 0.85rem;">Message details</div>
+                            <small class="text-secondary" th:text="${#temporals.format(n.createdAt, 'dd MMM, HH:mm')}">Timestamp</small>
+                        </a>
+                    </li>
+                    <li th:if="${#lists.isEmpty(recentNotifications)}" class="p-3 text-center text-secondary small">
+                        No notifications
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-center text-info small py-2" th:href="@{/notifications}">
+                            View All Notifications
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- User Auth Dropdown -->
+            <div class="dropdown" sec:authorize="isAuthenticated()">
+                <button class="btn btn-transit-outline dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-user me-2"></i>
+                    <span sec:authentication="principal.fullName">User</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                    <li><a class="dropdown-item" th:href="@{/profile}"><i class="fa-solid fa-gear me-2"></i>Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <button class="dropdown-item text-danger" onclick="document.getElementById('globalLogoutForm').submit();">
+                            <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <!-- Global Hidden Logout Form -->
+            <form th:action="@{/logout}" method="post" id="globalLogoutForm" class="d-none"></form>
+        </div>
+    </div>
+</body>
+</html>

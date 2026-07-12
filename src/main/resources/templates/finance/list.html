@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Financial Audits')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('finance')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Financial Operations')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Top toolbar actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">Fleet Expenditure Audits</h4>
+                <p class="text-secondary mb-0 small">Audit operating costsheets, fuel efficiency metrics, ancillary expenses, and generate reports</p>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <a th:href="@{/finance/fuel/new}" class="btn btn-transit-outline">
+                    <i class="fa-solid fa-gas-pump me-2 text-cyan"></i>Record Fuel Log
+                </a>
+                <a th:href="@{/finance/expense/new}" class="btn btn-transit-outline">
+                    <i class="fa-solid fa-receipt me-2 text-warning"></i>Log Expense
+                </a>
+                <div class="dropdown">
+                    <button class="btn btn-transit dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fa-solid fa-file-export me-2"></i>Export Sheets
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/finance/report/pdf}" target="_blank">
+                                <i class="fa-solid fa-file-pdf me-2"></i>PDF Cost Summary
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item text-success" th:href="@{/finance/report/excel}" target="_blank">
+                                <i class="fa-solid fa-file-excel me-2"></i>Excel Cost Ledger
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial KPI Stats Grid -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="transit-card">
+                    <div class="kpi-title text-secondary">Total Fuel Spending</div>
+                    <div class="kpi-value text-indigo">
+                        ₹<span th:text="${#numbers.formatDecimal(totalFuelCost, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </div>
+                    <small class="text-secondary">Diesel oil refills cost</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="transit-card">
+                    <div class="kpi-title text-secondary">Ancillary Expenses</div>
+                    <div class="kpi-value text-cyan">
+                        ₹<span th:text="${#numbers.formatDecimal(totalExpenseCost, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </div>
+                    <small class="text-secondary">Tolls, parking, repairs, fines</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="transit-card">
+                    <div class="kpi-title text-secondary">Grand Expenditure</div>
+                    <div class="kpi-value text-warning">
+                        ₹<span th:text="${#numbers.formatDecimal(grandTotal, 1, 'COMMA', 2, 'POINT')}">0.00</span>
+                    </div>
+                    <small class="text-secondary">Operational costs audited</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Costs Audit Tabs -->
+        <div class="transit-table-card">
+            <div class="p-3 border-bottom border-secondary">
+                <ul class="nav nav-tabs card-header-tabs bg-transparent border-0" id="costTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active text-light bg-transparent border-0 px-4 py-2 border-bottom border-primary" 
+                                id="fuel-tab" data-bs-toggle="tab" data-bs-target="#fuel" type="button" role="tab">
+                            <i class="fa-solid fa-gas-pump me-2 text-cyan"></i>Fuel Oil logs
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link text-secondary bg-transparent border-0 px-4 py-2" 
+                                id="expenses-tab" data-bs-toggle="tab" data-bs-target="#expenses" type="button" role="tab">
+                            <i class="fa-solid fa-receipt me-2 text-warning"></i>Ancillary Expenses
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tab-content" id="costTabsContent">
+                <!-- Tab 1: Fuel Logs -->
+                <div class="tab-pane fade show active" id="fuel" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="transit-table">
+                            <thead>
+                                <tr>
+                                    <th>Refill Date</th>
+                                    <th>Vehicle Asset</th>
+                                    <th>Volume Liters</th>
+                                    <th>Price / L</th>
+                                    <th>Odometer km</th>
+                                    <th>Fuel Station</th>
+                                    <th>Expenditure Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="f : ${fuelLogs}">
+                                    <td th:text="${f.fuelDate != null ? #temporals.format(f.fuelDate, 'dd MMM yyyy, HH:mm') : 'N/A'}">Date</td>
+                                    <td>
+                                        <div class="d-flex flex-column" th:if="${f.vehicle != null}">
+                                            <span class="font-weight-bold text-light" th:text="${f.vehicle.vehicleName}">Volvo</span>
+                                            <small class="text-secondary" th:text="${f.vehicle.registrationNumber}">Plate</small>
+                                        </div>
+                                        <span th:if="${f.vehicle == null}" class="text-muted">N/A</span>
+                                    </td>
+                                    <td th:text="${f.quantity + ' Liters'}">50 Liters</td>
+                                    <td th:text="${'₹' + f.pricePerLiter}">₹2.1</td>
+                                    <td th:text="${#numbers.formatDecimal(f.odometerReading, 1, 'COMMA', 0, 'POINT') + ' km'}">115000</td>
+                                    <td th:text="${f.fuelStation != null ? f.fuelStation : 'National Stn'}">Chevron</td>
+                                    <td class="text-danger font-weight-bold" th:text="${'₹' + #numbers.formatDecimal(f.cost, 1, 'COMMA', 2, 'POINT')}">₹105.00</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(fuelLogs)}">
+                                    <td colspan="7" class="text-center text-secondary py-5">No fuel refill logs verified.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Ancillary Expenses -->
+                <div class="tab-pane fade" id="expenses" role="tabpanel">
+                    <div class="table-responsive">
+                        <table class="transit-table">
+                            <thead>
+                                <tr>
+                                    <th>Expense Date</th>
+                                    <th>Vehicle Asset</th>
+                                    <th>Category class</th>
+                                    <th>Remarks / Details</th>
+                                    <th>Valuation Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="e : ${expenses}">
+                                    <td th:text="${e.expenseDate}">Date</td>
+                                    <td>
+                                        <div class="d-flex flex-column" th:if="${e.vehicle != null}">
+                                            <span class="font-weight-bold text-light" th:text="${e.vehicle.vehicleName}">Volvo</span>
+                                            <small class="text-secondary" th:text="${e.vehicle.registrationNumber}">Plate</small>
+                                        </div>
+                                        <span th:if="${e.vehicle == null}" class="text-muted">N/A</span>
+                                    </td>
+                                    <td>
+                                        <span class="status-badge active" th:text="${e.category}">Tolls</span>
+                                    </td>
+                                    <td th:text="${e.description}">E-Pass recharge</td>
+                                    <td class="text-danger font-weight-bold" th:text="${'₹' + #numbers.formatDecimal(e.amount, 1, 'COMMA', 2, 'POINT')}">₹50.00</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(expenses)}">
+                                    <td colspan="5" class="text-center text-secondary py-5">No ancillary expenses logged currently.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+    <!-- Simple JS to handle Bootstrap dynamic tabs styling toggle -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var triggerTabList = [].slice.call(document.querySelectorAll('#costTabs button'))
+            triggerTabList.forEach(function (triggerEl) {
+                var tabTrigger = new bootstrap.Tab(triggerEl)
+                triggerEl.addEventListener('click', function (event) {
+                    event.preventDefault()
+                    
+                    // remove active borders from all
+                    triggerTabList.forEach(btn => {
+                        btn.classList.remove('text-light');
+                        btn.classList.add('text-secondary');
+                        btn.style.borderBottom = 'none';
+                    });
+                    
+                    this.classList.remove('text-secondary');
+                    this.classList.add('text-light');
+                    this.style.borderBottom = '2px solid rgb(99, 102, 241)';
+                    
+                    tabTrigger.show()
+                })
+            })
+        });
+    </script>
+</body>
+</html>

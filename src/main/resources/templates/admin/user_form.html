@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head(${user.id == null ? 'Register New User' : 'Edit User Settings'})}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('users')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar(${user.id == null ? 'Register User Asset' : 'Configure User Account'})}"></div>
+    
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="transit-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 text-light">
+                            <i class="fa-solid fa-user-gear me-2 text-indigo"></i>
+                            <span th:text="${user.id == null ? 'New User Profiles Specifications' : 'Update Credentials for ' + user.username}">Specs</span>
+                        </h5>
+                        <a th:href="@{/admin/users}" class="btn btn-transit-outline btn-sm">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Users List
+                        </a>
+                    </div>
+
+                    <form th:action="${user.id == null} ? @{/admin/users/new} : @{/admin/users/edit/{id}(id=${user.id})}" 
+                          th:object="${user}" method="post">
+                        
+                        <div class="row g-4">
+                            <!-- Username -->
+                            <div class="col-md-6">
+                                <label for="username" class="form-label text-secondary font-weight-bold">Accounts Login Username</label>
+                                <input type="text" id="username" th:field="*{username}" class="form-control transit-form-control" placeholder="e.g. jsmith" required>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Error</div>
+                            </div>
+
+                            <!-- Role Category Selection -->
+                            <div class="col-md-6">
+                                <label for="roleId" class="form-label text-secondary font-weight-bold">Designated Operational Role</label>
+                                <select id="roleId" name="roleId" class="form-select transit-form-control" required>
+                                    <option th:each="r : ${roles}" 
+                                            th:value="${r.id}" 
+                                            th:text="${r.name}" 
+                                            th:selected="${user.role != null && user.role.id == r.id}">ADMIN</option>
+                                </select>
+                            </div>
+
+                            <!-- Password Fields -->
+                            <div class="col-md-6" th:if="${user.id == null}">
+                                <label for="password" class="form-label text-secondary font-weight-bold">Account Security Password</label>
+                                <input type="password" id="password" th:field="*{password}" class="form-control transit-form-control" placeholder="Strength criteria applies" required>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Error</div>
+                            </div>
+                            
+                            <div class="col-md-6" th:if="${user.id != null}">
+                                <label for="newPassword" class="form-label text-secondary font-weight-bold">Reset Password (Optional)</label>
+                                <input type="password" id="newPassword" name="newPassword" class="form-control transit-form-control" placeholder="Leave blank to maintain current password">
+                            </div>
+
+                            <!-- Active status configuration -->
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="form-check form-switch mt-4">
+                                    <input class="form-check-input bg-dark border-secondary" type="checkbox" id="active" th:field="*{active}">
+                                    <label class="form-check-label text-light font-weight-bold ms-2" for="active">Enable Active Status & Access Permissions</label>
+                                </div>
+                            </div>
+
+                            <hr class="border-secondary my-4">
+
+                            <!-- Personal Contact Details -->
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label text-secondary font-weight-bold">First Name</label>
+                                <input type="text" id="firstName" th:field="*{firstName}" class="form-control transit-form-control" placeholder="e.g. John" required>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Error</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label text-secondary font-weight-bold">Last Name</label>
+                                <input type="text" id="lastName" th:field="*{lastName}" class="form-control transit-form-control" placeholder="e.g. Smith" required>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Error</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="email" class="form-label text-secondary font-weight-bold">Email Address</label>
+                                <input type="email" id="email" th:field="*{email}" class="form-control transit-form-control" placeholder="e.g. john.smith@transitops.com" required>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label text-secondary font-weight-bold">Phone Number Contact</label>
+                                <input type="text" id="phone" th:field="*{phone}" class="form-control transit-form-control" placeholder="e.g. +91 99999 88888">
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Error</div>
+                            </div>
+
+                        </div>
+
+                        <!-- Actions Buttons -->
+                        <div class="mt-4 pt-3 d-flex justify-content-end gap-3">
+                            <a th:href="@{/admin/users}" class="btn btn-transit-outline px-4">Cancel</a>
+                            <button type="submit" class="btn btn-transit px-4">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Save User Profile
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

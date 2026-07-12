@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Alerts Center')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('notifications')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Operations Inbox')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">Operational Notifications</h4>
+                <p class="text-secondary mb-0 small">Review real-time dispatch updates, vehicle service checklists, and registration updates</p>
+            </div>
+            <a th:href="@{/notifications/clear}" class="btn btn-transit-outline btn-sm text-danger" th:if="${not #lists.isEmpty(notifications)}">
+                <i class="fa-solid fa-trash-can me-2"></i>Clear All Alerts
+            </a>
+        </div>
+
+        <div class="transit-card pb-1">
+            <div class="list-group list-group-flush bg-transparent">
+                <div class="list-group-item bg-transparent text-secondary py-3 px-0 border-bottom border-secondary d-flex justify-content-between align-items-center"
+                     th:each="n : ${notifications}" th:classappend="${n.isRead} ? 'opacity-75' : ''">
+                    
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded border bg-dark d-flex align-items-center justify-content-center"
+                             th:classappend="${n.isRead} ? 'border-secondary text-secondary' : 'border-info text-info'"
+                             style="width: 40px; height: 40px;">
+                            <i class="fa-solid fa-bell"></i>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="text-light fs-6 font-weight-bold" th:text="${n.message}">Notification Description Message</span>
+                            <small class="text-secondary mt-1" th:text="${n.createdAt != null ? #temporals.format(n.createdAt, 'dd MMM yyyy, HH:mm:ss') : 'N/A'}">Date Timestamp</small>
+                        </div>
+                    </div>
+
+                    <div>
+                        <a th:href="@{/notifications/read/{id}(id=${n.id})}" th:if="${not n.isRead}" class="btn btn-transit-outline btn-sm text-info">
+                            <i class="fa-solid fa-circle-check me-1"></i>Mark Read
+                        </a>
+                        <span th:if="${n.isRead}" class="badge bg-secondary">Read</span>
+                    </div>
+
+                </div>
+
+                <div class="py-5 text-center text-secondary" th:if="${#lists.isEmpty(notifications)}">
+                    <i class="fa-solid fa-bell-slash mb-3 text-muted display-4"></i>
+                    <p class="mb-0">Your alert queue is clean. No active notifications.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

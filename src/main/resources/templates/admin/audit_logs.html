@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('System Audit Trail')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('audit_logs')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('System Audit Trails')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">Chronological Audit Trails</h4>
+                <p class="text-secondary mb-0 small">Verify all structural creation, deletion, modifications and user login sessions globally</p>
+            </div>
+        </div>
+
+        <!-- Audit Table Card -->
+        <div class="transit-table-card">
+            <div class="transit-table-header">
+                <h5 class="mb-0 text-light"><i class="fa-solid fa-receipt me-2 text-indigo"></i>Security Logs</h5>
+                <span class="badge bg-secondary p-2" th:text="${auditLogs.size() + ' Logs Listed'}">0 Logs</span>
+            </div>
+            <div class="table-responsive">
+                <table class="transit-table">
+                    <thead>
+                        <tr>
+                            <th>Log Reference ID</th>
+                            <th>Active User</th>
+                            <th>Action Type</th>
+                            <th>Timestamp</th>
+                            <th>Details & Context</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="log : ${auditLogs}">
+                            <td class="font-weight-bold text-light" th:text="'SEC-LOG-' + ${log.id}">LOG-01</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid fa-user-circle text-muted"></i>
+                                    <span class="text-light" th:text="${log.username}">admin</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge py-2 px-3" 
+                                      th:classappend="${#strings.contains(log.action, 'CREATE')} ? 'bg-success' : (${#strings.contains(log.action, 'DELETE')} ? 'bg-danger' : 'bg-warning')"
+                                      th:text="${log.action}">EVENT_ACTION</span>
+                            </td>
+                            <td th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'dd MMM yyyy, HH:mm:ss') : 'N/A'}">Timestamp</td>
+                            <td class="text-secondary" th:text="${log.details}">Action details recorded.</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(auditLogs)}">
+                            <td colspan="5" class="text-center text-secondary py-5">
+                                <i class="fa-solid fa-box-open mb-3 text-muted display-4"></i>
+                                <p>No audit action logs registered in the database.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

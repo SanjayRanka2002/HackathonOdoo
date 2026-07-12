@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Users Credentials')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('users')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Administrator Control')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Top toolbar actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">User Credentials Manager</h4>
+                <p class="text-secondary mb-0 small">Create system operators, edit staff functional profiles, and toggle active permissions</p>
+            </div>
+            <a th:href="@{/admin/users/new}" class="btn btn-transit">
+                <i class="fa-solid fa-plus me-2"></i>Register New User
+            </a>
+        </div>
+
+        <!-- Users Table Card -->
+        <div class="transit-table-card">
+            <div class="transit-table-header">
+                <h5 class="mb-0 text-light"><i class="fa-solid fa-users me-2 text-indigo"></i>Authorized Users</h5>
+                <span class="badge bg-secondary p-2" th:text="${users.size() + ' Accounts Registered'}">0 Accounts</span>
+            </div>
+            <div class="table-responsive">
+                <table class="transit-table">
+                    <thead>
+                        <tr>
+                            <th>Account Name</th>
+                            <th>Username</th>
+                            <th>Email Address</th>
+                            <th>Phone Contact</th>
+                            <th>Designated Role</th>
+                            <th>Status State</th>
+                            <th class="text-center">Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="p-2 border border-secondary rounded-circle bg-dark d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                        <i class="fa-solid fa-user-gear text-secondary"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-bold text-light" th:text="${user.firstName + ' ' + user.lastName}">Full Name</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="font-weight-bold text-light" th:text="${user.username}">username</td>
+                            <td th:text="${user.email}">email@transitops.com</td>
+                            <td th:text="${user.phone != null && !user.phone.isBlank() ? user.phone : 'N/A'}">Phone</td>
+                            <td>
+                                <span class="badge bg-dark border border-secondary text-info p-2" th:text="${user.role != null ? user.role.name : 'N/A'}">Role</span>
+                            </td>
+                            <td>
+                                <span class="badge" th:classappend="${user.active} ? 'bg-success' : 'bg-danger'" th:text="${user.active} ? 'ACTIVE' : 'INACTIVE'">ACTIVE</span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" class="btn btn-transit-outline btn-sm text-info" title="Configure Profile">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a onclick="return confirm('Delete this user account permanently? Irreversible operational action.');" 
+                                       th:href="@{/admin/users/delete/{id}(id=${user.id})}" class="btn btn-transit-outline btn-sm text-danger" title="Delete Operator">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(users)}">
+                            <td colspan="7" class="text-center text-secondary py-5">
+                                <i class="fa-solid fa-user-slash mb-3 text-muted display-4"></i>
+                                <p>No administrative users found in system records.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

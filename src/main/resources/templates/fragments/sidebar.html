@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+    <!-- Sidebar Fragment -->
+    <div th:fragment="sidebar(activePage)" class="sidebar">
+        <a th:href="@{/}" class="sidebar-brand">
+            <i class="fa-solid fa-truck-fast"></i>
+            <span>TransitOps</span>
+        </a>
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a th:href="@{/}" class="sidebar-link" th:classappend="${activePage == 'dashboard' ? 'active' : ''}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            
+            <!-- Vehicles Menu -->
+            <li class="sidebar-item" sec:authorize="hasAnyRole('ADMIN', 'FLEET_MANAGER', 'DISPATCHER')">
+                <a th:href="@{/vehicles}" class="sidebar-link" th:classappend="${activePage == 'vehicles' ? 'active' : ''}">
+                    <i class="fa-solid fa-truck"></i>
+                    <span>Vehicles</span>
+                </a>
+            </li>
+            
+            <!-- Drivers Menu -->
+            <li class="sidebar-item" sec:authorize="hasAnyRole('ADMIN', 'FLEET_MANAGER', 'DISPATCHER')">
+                <a th:href="@{/drivers}" class="sidebar-link" th:classappend="${activePage == 'drivers' ? 'active' : ''}">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>Drivers</span>
+                </a>
+            </li>
+            
+            <!-- Trips Menu -->
+            <li class="sidebar-item" sec:authorize="hasAnyRole('ADMIN', 'DISPATCHER')">
+                <a th:href="@{/trips}" class="sidebar-link" th:classappend="${activePage == 'trips' ? 'active' : ''}">
+                    <i class="fa-solid fa-route"></i>
+                    <span>Trips</span>
+                </a>
+            </li>
+            
+            <!-- Maintenance Menu -->
+            <li class="sidebar-item" sec:authorize="hasAnyRole('ADMIN', 'FLEET_MANAGER')">
+                <a th:href="@{/maintenance}" class="sidebar-link" th:classappend="${activePage == 'maintenance' ? 'active' : ''}">
+                    <i class="fa-solid fa-wrench"></i>
+                    <span>Maintenance</span>
+                </a>
+            </li>
+            
+            <!-- Finance Menu -->
+            <li class="sidebar-item" sec:authorize="hasAnyRole('ADMIN', 'FINANCIAL_ANALYST')">
+                <a th:href="@{/finance}" class="sidebar-link" th:classappend="${activePage == 'finance' ? 'active' : ''}">
+                    <i class="fa-solid fa-dollar-sign"></i>
+                    <span>Financials</span>
+                </a>
+            </li>
+            
+            <!-- User Administration (ADMIN only) -->
+            <li class="sidebar-item" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ADMIN')">
+                <a th:href="@{/admin/users}" class="sidebar-link" th:classappend="${activePage == 'users' ? 'active' : ''}">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>Users Control</span>
+                </a>
+            </li>
+
+            <!-- Security Audit Logs (ADMIN only) -->
+            <li class="sidebar-item" sec:authorize="hasRole('ROLE_ADMIN') || hasRole('ADMIN')">
+                <a th:href="@{/admin/audit-logs}" class="sidebar-link" th:classappend="${activePage == 'audit_logs' ? 'active' : ''}">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Audit Logs</span>
+                </a>
+            </li>
+
+            <!-- Notifications Center (All users) -->
+            <li class="sidebar-item">
+                <a th:href="@{/notifications}" class="sidebar-link" th:classappend="${activePage == 'notifications' ? 'active' : ''}">
+                    <i class="fa-solid fa-bell"></i>
+                    <span>Notifications</span>
+                    <span class="badge bg-danger ms-auto rounded-pill" 
+                          th:if="${unreadNotificationsCount > 0}" 
+                          th:text="${unreadNotificationsCount}">3</span>
+                </a>
+            </li>
+
+            <!-- Profile Settings (All users) -->
+            <li class="sidebar-item">
+                <a th:href="@{/profile}" class="sidebar-link" th:classappend="${activePage == 'profile' ? 'active' : ''}">
+                    <i class="fa-solid fa-circle-user"></i>
+                    <span>My Settings</span>
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Sidebar User Profile Footer -->
+        <div class="sidebar-profile" sec:authorize="isAuthenticated()">
+            <div class="profile-info">
+                <span class="profile-name" sec:authentication="principal.fullName">User Profile</span>
+                <span class="profile-role" sec:authentication="principal.authorities[0].authority">Role</span>
+            </div>
+            <form th:action="@{/logout}" method="post" id="logoutForm" class="m-0">
+                <button type="submit" class="btn btn-link text-danger p-0" title="Logout" style="text-decoration: none;">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

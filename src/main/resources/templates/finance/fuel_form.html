@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Record Fuel Log')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('finance')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Record Fuel Log')}"></div>
+    
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="transit-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 text-light">
+                            <i class="fa-solid fa-gas-pump me-2 text-indigo"></i>
+                            <span>Refill Fuel Oil Ticket</span>
+                        </h5>
+                        <a th:href="@{/finance}" class="btn btn-transit-outline btn-sm">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Cost Ledger
+                        </a>
+                    </div>
+
+                    <form th:action="@{/finance/fuel/new}" th:object="${fuelLog}" method="post">
+                        
+                        <div class="row g-4">
+                            <!-- Vehicle Selector -->
+                            <div class="col-md-6">
+                                <label for="vehicleId" class="form-label text-secondary font-weight-bold">Select Refilled Vehicle</label>
+                                <select id="vehicleId" name="vehicleId" class="form-select transit-form-control" required>
+                                    <option value="" disabled selected>-- Select Vehicle --</option>
+                                    <option th:each="v : ${vehicles}" 
+                                            th:value="${v.id}" 
+                                            th:text="${v.vehicleName + ' (' + v.registrationNumber + ') • Current Odometer: ' + v.currentOdometer + ' km'}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Odometer reading -->
+                            <div class="col-md-6">
+                                <label for="odometerReading" class="form-label text-secondary font-weight-bold">Refill Odometer Mileage (km)</label>
+                                <input type="number" step="0.1" id="odometerReading" th:field="*{odometerReading}" class="form-control transit-form-control" placeholder="e.g. 120500" required>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('odometerReading')}" th:errors="*{odometerReading}">Error</div>
+                            </div>
+
+                            <!-- Quantity -->
+                            <div class="col-md-4">
+                                <label for="quantity" class="form-label text-secondary font-weight-bold">Refill Quantity Volumes (L)</label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" id="quantity" th:field="*{quantity}" class="form-control transit-form-control" placeholder="e.g. 75.5" required>
+                                    <span class="input-group-text bg-dark border-secondary text-secondary">L</span>
+                                </div>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">Error</div>
+                            </div>
+
+                            <!-- Price Per Liter -->
+                            <div class="col-md-4">
+                                <label for="pricePerLiter" class="form-label text-secondary font-weight-bold">Refill Diesel Unit Price (₹/L)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-secondary">₹</span>
+                                    <input type="number" step="0.001" id="pricePerLiter" th:field="*{pricePerLiter}" class="form-control transit-form-control" placeholder="e.g. 1.85" required>
+                                </div>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('pricePerLiter')}" th:errors="*{pricePerLiter}">Error</div>
+                            </div>
+
+                            <!-- Total Cost -->
+                            <div class="col-md-4">
+                                <label for="cost" class="form-label text-secondary font-weight-bold">Refill Costs Total (₹)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-dark border-secondary text-secondary">₹</span>
+                                    <input type="number" step="0.01" id="cost" th:field="*{cost}" class="form-control transit-form-control" placeholder="Automatically calculated..." required>
+                                </div>
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('cost')}" th:errors="*{cost}">Error</div>
+                            </div>
+
+                            <!-- Fuel Station -->
+                            <div class="col-md-12">
+                                <label for="fuelStation" class="form-label text-secondary font-weight-bold">Fuel Station Station/Name</label>
+                                <input type="text" id="fuelStation" th:field="*{fuelStation}" class="form-control transit-form-control" placeholder="e.g. Chevron Terminal Hub 14">
+                                <div class="text-danger mt-1 small" th:if="${#fields.hasErrors('fuelStation')}" th:errors="*{fuelStation}">Error</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions Buttons -->
+                        <div class="mt-4 pt-3 d-flex justify-content-end gap-3">
+                            <a th:href="@{/finance}" class="btn btn-transit-outline px-4">Cancel</a>
+                            <button type="submit" class="btn btn-transit px-4">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>Record Log
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+    <!-- Script to auto calculate cost based dynamically on quantity * unit price -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var qtyInput = document.getElementById("quantity");
+            var priceInput = document.getElementById("pricePerLiter");
+            var costInput = document.getElementById("cost");
+
+            function calculateTotals() {
+                var qty = parseFloat(qtyInput.value) || 0;
+                var prc = parseFloat(priceInput.value) || 0;
+                var total = qty * prc;
+                costInput.value = total.toFixed(2);
+            }
+
+            qtyInput.addEventListener("input", calculateTotals);
+            priceInput.addEventListener("input", calculateTotals);
+        });
+    </script>
+</body>
+</html>

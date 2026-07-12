@@ -1,4 +1,4 @@
-package com.example.Hackhathon;
+package com.hackhathon;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

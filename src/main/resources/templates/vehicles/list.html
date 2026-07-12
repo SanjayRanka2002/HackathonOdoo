@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Vehicles Inventory')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('vehicles')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Vehicle Inventory')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Top toolbar actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">Fleet Inventory Control</h4>
+                <p class="text-secondary mb-0 small">Manage trucks, load categories, mileage logs, and active statuses</p>
+            </div>
+            <a th:href="@{/vehicles/new}" class="btn btn-transit">
+                <i class="fa-solid fa-plus me-2"></i>Add Asset Vehicle
+            </a>
+        </div>
+
+        <!-- Fleet Inventory Table -->
+        <div class="transit-table-card">
+            <div class="transit-table-header">
+                <h5 class="mb-0 text-light"><i class="fa-solid fa-truck-moving me-2 text-indigo"></i>Registered Assets</h5>
+                <span class="badge bg-secondary p-2" th:text="${vehicles.size() + ' Total Vehicles'}">0 Vehicles</span>
+            </div>
+            <div class="table-responsive">
+                <table class="transit-table">
+                    <thead>
+                        <tr>
+                            <th>Asset Registered</th>
+                            <th>Type & model</th>
+                            <th>Load limit</th>
+                            <th>Odometer mileage</th>
+                            <th>Work status</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="vehicle : ${vehicles}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="p-2 border border-secondary rounded bg-dark">
+                                        <i class="fa-solid fa-truck text-secondary" style="font-size: 1.5rem;"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-bold text-light" th:text="${vehicle.vehicleName}">Volvo</span>
+                                        <small class="text-secondary" th:text="${vehicle.registrationNumber}">Registration</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span th:text="${vehicle.vehicleType}">Cargo Truck</span>
+                                    <small class="text-secondary" th:text="${vehicle.vehicleModel != null ? vehicle.vehicleModel : 'Standard Model'}">Model Details</small>
+                                </div>
+                            </td>
+                            <td th:text="${vehicle.loadCapacity + ' Tons'}">20 Tons</td>
+                            <td th:text="${#numbers.formatDecimal(vehicle.currentOdometer, 1, 'COMMA', 1, 'POINT') + ' km'}">120,000 km</td>
+                            <td>
+                                <span class="status-badge" th:classappend="${#strings.toLowerCase(vehicle.status)}" th:text="${vehicle.status}">ACTIVE</span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a th:href="@{/vehicles/{id}(id=${vehicle.id})}" class="btn btn-transit-outline btn-sm" title="View details & doc folders">
+                                        <i class="fa-solid fa-folder-open"></i>
+                                    </a>
+                                    <a th:href="@{/vehicles/edit/{id}(id=${vehicle.id})}" class="btn btn-transit-outline btn-sm text-info" title="Edit specs">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a onclick="return confirm('WARNING: Deleting this vehicle will remove its document links and operations logs. Proceed?');" 
+                                       th:href="@{/vehicles/delete/{id}(id=${vehicle.id})}" class="btn btn-transit-outline btn-sm text-danger" title="Retire/delete">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(vehicles)}">
+                            <td colspan="6" class="text-center text-secondary py-5">
+                                <i class="fa-solid fa-circle-exclamation mb-3 text-muted display-4"></i>
+                                <p>No operational vehicles found in inventories. Click 'Add Asset Vehicle' to seed.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/header :: head('Drivers Roster')}"></head>
+<body>
+
+    <!-- Sidebar Inclusion -->
+    <div th:replace="~{fragments/sidebar :: sidebar('drivers')}"></div>
+
+    <!-- Top Navbar Inclusion -->
+    <div th:replace="~{fragments/header :: top-navbar('Driver Management')}"></div>
+
+    <!-- Main Content Area -->
+    <div class="content-wrapper">
+        
+        <!-- Alerts block -->
+        <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i>
+            <span th:text="${successMessage}">Success!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-xmark me-2"></i>
+            <span th:text="${errorMessage}">Error occurred!</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Top toolbar actions -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1 text-light">Driver Duty Control</h4>
+                <p class="text-secondary mb-0 small">Track active drivers, license compliance, contact listings, and safety metrics</p>
+            </div>
+            <a th:href="@{/drivers/new}" class="btn btn-transit">
+                <i class="fa-solid fa-plus me-2"></i>Enlist New Driver
+            </a>
+        </div>
+
+        <!-- Drivers Inventory Table -->
+        <div class="transit-table-card">
+            <div class="transit-table-header">
+                <h5 class="mb-0 text-light"><i class="fa-solid fa-id-card me-2 text-indigo"></i>Operator Roster</h5>
+                <span class="badge bg-secondary p-2" th:text="${drivers.size() + ' Enlisted Drivers'}">0 Drivers</span>
+            </div>
+            <div class="table-responsive">
+                <table class="transit-table">
+                    <thead>
+                        <tr>
+                            <th>Operator Details</th>
+                            <th>License Spec</th>
+                            <th>Phone Contact</th>
+                            <th>Safety Score</th>
+                            <th>Status State</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="driver : ${drivers}">
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="p-2 border border-secondary rounded-circle bg-dark d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                        <i class="fa-solid fa-user-tie text-secondary" style="font-size: 1.25rem;"></i>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-bold text-light" th:text="${driver.driverName}">Driver Name</span>
+                                        <small class="text-secondary" th:text="${driver.email}">email@transit.com</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span th:text="${driver.licenseNumber}">DL-1234567890</span>
+                                    <small class="text-secondary" th:text="'Cat: ' + ${driver.licenseCategory}">Heavy Commercial</small>
+                                </div>
+                            </td>
+                            <td th:text="${driver.phone}">+1 (555) 123-4567</td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="font-weight-bold" 
+                                          th:text="${driver.safetyScore != null ? driver.safetyScore : '4.5'}"
+                                          th:classappend="${driver.safetyScore != null && driver.safetyScore >= 4.0} ? 'text-success' : 'text-warning'">4.5</span>
+                                    <i class="fa-solid fa-star text-warning" style="font-size: 0.8rem;"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="status-badge" th:classappend="${#strings.toLowerCase(driver.status)}" th:text="${driver.status}">ACTIVE</span>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a th:href="@{/drivers/{id}(id=${driver.id})}" class="btn btn-transit-outline btn-sm" title="View files & folders">
+                                        <i class="fa-solid fa-folder-open"></i>
+                                    </a>
+                                    <a th:href="@{/drivers/edit/{id}(id=${driver.id})}" class="btn btn-transit-outline btn-sm text-info" title="Edit details">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <a onclick="return confirm('WARNING: Retiring this driver is irreversible. Direct trips links will remain. Proceed?');" 
+                                       th:href="@{/drivers/delete/{id}(id=${driver.id})}" class="btn btn-transit-outline btn-sm text-danger" title="Remove operator">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(drivers)}">
+                            <td colspan="6" class="text-center text-secondary py-5">
+                                <i class="fa-solid fa-user-slash mb-3 text-muted display-4"></i>
+                                <p>No drivers currently registered. Click 'Enlist New Driver' to start.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts Inclusion -->
+    <div th:replace="~{fragments/footer :: scripts}"></div>
+</body>
+</html>
